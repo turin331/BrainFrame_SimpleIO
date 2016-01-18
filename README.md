@@ -47,6 +47,7 @@ To excute the application run :
 
     make run RUNRULE="DFE"
 
+The network size, simulation time and neuron initial states can be edited from the CPU code.
 
 BrainFrame Demo on [AppGallery](http://appgallery.maxeler.com/) 
 
