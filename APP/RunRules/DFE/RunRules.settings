@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<buildProfile>
+<common>
+<boardModel type="MAIA"/>
+<simulation enabled="false"/>
+<enableMPCX enabled="true"/>
+</common>
+<maxFiles>
+<maxFile buildName="infoli" buildOrUseExisting="build">
+<runConfiguration askBeforeAutoBuild="true">
+<mainClass>infoli.infoliManager</mainClass>
+<maxHeapSize>2</maxHeapSize>
+</runConfiguration>
+<selectEngineTarget enabled="false">VECTIS</selectEngineTarget>
+<overrideEnableMPCX enabled="false" value="false"/>
+</maxFile>
+</maxFiles>
+<cpuCode targetType="executable">
+<libraryName/>
+<exeName>infoli</exeName>
+<skin>
+<ancillaryReleaseInformation enabled="false">
+<dir name=""/>
+</ancillaryReleaseInformation>
+</skin>
+<arguments/>
+<remoteExecution enabled="false">
+<remoteMachineName/>
+<scriptName/>
+</remoteExecution>
+<customDefinitions># This text will be included verbatim in the build process.
+# It has to be valid Makefile syntax.
+# Set USE_SLIC=0 if your CPUCode uses the deprecated MaxCompilerRT interface.</customDefinitions>
+</cpuCode>
+<simulator>
+<deleteDRAM enabled="false"/>
+<maxDRAMSize enabled="false"/>
+<DRAMFile enabled="false"/>
+<socketName/>
+<startStopScript enabled="false"/>
+<numberOfDevices>1</numberOfDevices>
+<ethernetOneEnabled enabled="false"/>
+<ipAddressOne/>
+<netmaskOne/>
+<pcapFileOne/>
+<ethernetTwoEnabled enabled="false"/>
+<ipAddressTwo/>
+<netmaskTwo/>
+<pcapFileTwo/>
+</simulator>
+</buildProfile>

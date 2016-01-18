@@ -1,0 +1,147 @@
+package infoli;
+
+import com.maxeler.maxcompiler.v2.managers.BuildConfig;
+import com.maxeler.maxcompiler.v2.managers.custom.CustomManager;
+import com.maxeler.maxcompiler.v2.managers.custom.DFELink;
+import com.maxeler.maxcompiler.v2.managers.custom.blocks.KernelBlock;
+import com.maxeler.maxcompiler.v2.managers.custom.stdlib.MemoryControlGroup;
+import com.maxeler.maxcompiler.v2.managers.custom.stdlib.MemoryControlGroup.MemoryAccessPattern;
+import com.maxeler.maxcompiler.v2.managers.engine_interfaces.CPUTypes;
+import com.maxeler.maxcompiler.v2.managers.engine_interfaces.EngineInterface;
+import com.maxeler.maxcompiler.v2.managers.engine_interfaces.EngineInterface.Direction;
+import com.maxeler.maxcompiler.v2.managers.engine_interfaces.InterfaceParam;
+
+public class infoliManager extends CustomManager {
+
+
+	public infoliManager(infoliEngineParameters engineParams) {
+		super(engineParams);
+
+		KernelBlock  kernel  = addKernel(new infoliKernel(makeKernelParameters(s_kernelName)));
+
+		config.setDefaultStreamClockFrequency(engineParams.getStreamFrequency());
+		config.setEnableAddressGeneratorsInSlowClock(true);
+
+		DFELink cpu2lmem = addStreamToOnCardMemory("cpu2lmem", MemoryControlGroup.MemoryAccessPattern.LINEAR_1D);
+		DFELink lmem2cpu = addStreamFromOnCardMemory("lmem2cpu", MemoryControlGroup.MemoryAccessPattern.LINEAR_1D);
+
+		DFELink fromcpu = addStreamFromCPU("fromcpu");
+		DFELink tocpu = addStreamToCPU("tocpu");
+
+		cpu2lmem <== fromcpu;
+		tocpu <== lmem2cpu;
+
+
+
+		DFELink ini = addStreamFromOnCardMemory("Ini", MemoryAccessPattern.LINEAR_1D);
+		DFELink iApp = addStreamFromOnCardMemory("iApp", MemoryAccessPattern.LINEAR_1D);
+		DFELink IC = addStreamFromOnCardMemory("IC", MemoryAccessPattern.LINEAR_1D);
+
+
+		kernel.getInput("Ini").connect(ini);
+		kernel.getInput("iApp").connect(iApp);
+		kernel.getInput("IC").connect(IC);
+
+		DFELink s = addStreamToOnCardMemory("s", MemoryAccessPattern.LINEAR_1D);
+
+		s.connect(kernel.getOutput("s"));
+
+	}
+
+	static final int CellParams = 24;
+	static final int UnrollFactor =16;  //Make sure this has the same value in the kernel code and manager (UnrollFactor)
+
+
+	private static final String s_kernelName = "infoliKernel";
+
+	public static void main(String[] args) {
+		infoliEngineParameters params = new infoliEngineParameters(args);
+	CustomManager manager = new infoliManager(params);
+
+
+		manager.createSLiCinterface(interfaceDefault());
+		configBuild(manager, params);
+
+		manager.createSLiCinterface(interfaceWrite("writeLMem"));
+		manager.createSLiCinterface(interfaceRead("readLMem"));
+		manager.build();
+	}
+
+	private static EngineInterface interfaceWrite(String name) {
+		EngineInterface ei = new EngineInterface(name);
+		CPUTypes TYPE = CPUTypes.INT64;
+		CPUTypes   type_float = CPUTypes.FLOAT;
+		InterfaceParam start = ei.addParam("start", TYPE);
+		InterfaceParam size  = ei.addParam("size", TYPE);
+
+		InterfaceParam sizeInBytes = size * type_float.sizeInBytes();
+
+		ei.setStream("fromcpu", type_float, sizeInBytes );
+		ei.setLMemLinear("cpu2lmem", start* type_float.sizeInBytes() , sizeInBytes);
+		ei.ignoreAll(Direction.IN_OUT);
+		return ei;
+	}
+
+	private static EngineInterface interfaceRead(String name) {
+		EngineInterface ei = new EngineInterface(name);
+		CPUTypes TYPE = CPUTypes.INT64;
+		CPUTypes   type_float = CPUTypes.FLOAT;
+		InterfaceParam start = ei.addParam("start", TYPE);
+		InterfaceParam size  = ei.addParam("size", TYPE);
+
+		InterfaceParam sizeInBytes = size * type_float.sizeInBytes();
+
+		ei.setLMemLinear("lmem2cpu", start* type_float.sizeInBytes(), sizeInBytes);
+		ei.setStream("tocpu", type_float, sizeInBytes);
+		ei.ignoreAll(Direction.IN_OUT);
+		return ei;
+	}
+
+	private static EngineInterface interfaceDefault() {
+		EngineInterface engine_interface = new EngineInterface();
+		CPUTypes   type = CPUTypes.INT64;
+		CPUTypes   type_float = CPUTypes.FLOAT;
+		//int        size = type.sizeInBytes();
+		int        float_size = type_float.sizeInBytes();
+		InterfaceParam  N    = engine_interface.addParam("N", type);
+		InterfaceParam  N_size   = engine_interface.addParam("N_size", type);
+		InterfaceParam  simsteps    = engine_interface.addParam("simsteps", type);
+		InterfaceParam  time_mux_factor    = engine_interface.addParam("time_mux_factor", type);
+		InterfaceParam  Max_N_Size    = engine_interface.addParam("Max_N_Size", type);
+
+		InterfaceParam  zero = engine_interface.addConstant(0l);
+		//ticks
+		engine_interface.setTicks(s_kernelName, (N/UnrollFactor +(simsteps* engine_interface.getAutoLoopOffset(s_kernelName, "writeLoop0"))));
+		//Scalar inputs
+		engine_interface.setScalar(s_kernelName, "N_size", N_size);
+		engine_interface.setScalar(s_kernelName, "simsteps", simsteps);
+		engine_interface.setScalar(s_kernelName, "time_mux_factor", time_mux_factor);
+		engine_interface.setScalar(s_kernelName, "Max_N_Size", Max_N_Size);
+
+		//Input Traces from LMEM
+		engine_interface.setLMemLinear("Ini", zero, CellParams*N_size * float_size);
+		engine_interface.setLMemLinear("iApp", (CellParams*(Max_N_Size) * float_size), N_size*simsteps* float_size);
+		engine_interface.setLMemLinear("IC",(CellParams*(Max_N_Size) * float_size) + ((Max_N_Size)*simsteps* float_size)+((Max_N_Size)*simsteps* float_size) ,N_size* float_size);
+
+
+		//Output To LMEM
+		engine_interface.setLMemLinear("s",(CellParams*(Max_N_Size) * float_size) + ((Max_N_Size)*simsteps* float_size) ,N_size*simsteps* float_size);
+		//engine_interface.setLMemLinear("sFrom",(CellParams*(Max_N_Size+128) * float_size) + ((Max_N_Size+128)*simsteps* float_size) ,N_size*simsteps* float_size);
+
+
+		engine_interface.ignoreAll(Direction.IN_OUT);
+		return engine_interface;
+	}
+
+
+
+
+
+
+	private static void configBuild(CustomManager manager, infoliEngineParameters params) {
+		BuildConfig buildConfig = manager.getBuildConfig();
+		buildConfig.setMPPRCostTableSearchRange(params.getMPPRStart(), params.getMPPREnd());
+		buildConfig.setMPPRParallelism(params.getMPPRNumThreads());
+		buildConfig.setMPPRRetryNearMissesThreshold(params.getMPPRRetryThreshold());
+	}
+}

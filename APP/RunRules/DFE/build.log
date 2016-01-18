@@ -1,0 +1,42 @@
+Wed 11:27: ########################################## 
+Wed 11:27: Compiling.
+Wed 11:27: ########################################## 
+
+Wed 11:27: MaxCompiler version: 2013.3 (simulation only).
+Wed 11:27: Build DFE run rule for InferiorOlive_Unrolled_IniFix start time: Wed Feb 05 11:27:32 PST 2014.
+Wed 11:27: Project location: /home/demo/workspace/InferiorOlive_Unrolled_IniFix.
+Wed 11:27: Detailed build log: /home/demo/workspace/InferiorOlive_Unrolled_IniFix/RunRules/DFE/build.log.
+
+Wed 11:27: Compiling Engine Code.
+Wed 11:27: Building infoli.max file. 
+Wed 11:27: Setting environment variable:
+Wed 11:27: MAXCOMPILER_BUILD_DIR : /home/demo/workspace/InferiorOlive_Unrolled_IniFix/RunRules/DFE/maxfiles
+Wed 11:27: MAX_BUILDPARAMS : DFEModel='VECTIS' target='DFE' maxFileName='infoli'  
+Wed 11:27: Building output:
+Wed 11:27: MaxCompiler version: 2013.3 (simulation only)
+Wed 11:27: Build "infoli" start time: Wed Feb 05 11:27:36 PST 2014
+Wed 11:27: Main build process running as user demo on host localhost.localdomain
+Wed 11:27: Build location: /home/demo/Desktop/MaxCompiler-Builds/infoli_DFE_ss160
+Wed 11:27: Detailed build log available in "_build.log"
+Wed 11:27: ERROR: ----------------------------
+Wed 11:27: ERROR: Exception in thread "main":
+Wed 11:27: ERROR:  
+Wed 11:27: ERROR:   This version of MaxCompiler can only be used to target simulation. Please use a 
+Wed 11:27: ERROR:   different type of Manager or instantiate this Manager such that it targets 
+Wed 11:27: ERROR:   simulation. The latter is usually achieved by using an alternate constructor 
+Wed 11:27: ERROR:   with a boolean is_simuation (or similar) parameter set to true.
+Wed 11:27: ERROR: 
+Wed 11:27: ERROR: Exception Stack Trace com.maxeler.maxcompiler.v2.errors.MaxCompilerAPIError: 
+Wed 11:27: ERROR:    at com.maxeler.maxcompiler.v2.managers.DFEManager.checkSimulationBuildOnly(DFEManager.java:153)
+Wed 11:27: ERROR:    at com.maxeler.maxcompiler.v2.managers.DFEManager.<init>(DFEManager.java:131)
+Wed 11:27: ERROR:    at com.maxeler.maxcompiler.v2.managers.custom.CustomManager.<init>(CustomManager.java:614)
+Wed 11:27: ERROR:    at com.maxeler.maxcompiler.v2.managers.custom.CustomManager.<init>(CustomManager.java:502)
+Wed 11:27: ERROR:    at infoli.infoliManager.<init>(infoliManager.maxj:18)
+Wed 11:27: ERROR:    at infoli.infoliManager.main(infoliManager.maxj:71)
+Wed 11:27: ERROR: ----------------------------
+Wed 11:27: Building: infoli.max file finished.
+Wed 11:27: Build process failed while trying to create infoli.max file
+Wed 11:27: null
+Wed 11:27: Build failed: Wed Feb 05 11:27:36 PST 2014
+
+

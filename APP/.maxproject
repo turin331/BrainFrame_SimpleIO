@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<maxCompilerManager version="2">
+<enginePart internalEngineSubproject="InferiorOlive_Unrolled_IniFix_EngineCode" isSrcBin="false" isUseDefaultSelected="false" outputLocation="/InferiorOlive_Unrolled_IniFix_EngineCode/bin" projectName="InferiorOlive_Unrolled_IniFix"/>
+<cpuPart internalCpuSubproject="InferiorOlive_Unrolled_IniFix_CPUCode"/>
+<watchedFiles/>
+</maxCompilerManager>
