@@ -28,9 +28,9 @@ public class infoliEngineParameters extends EngineParameters {
 	@Override
 	protected void declarations() {
 //		declareParam(s_hasStreamStatus, DataType.BOOL, false);
-		declareParam(s_streamFrequency, DataType.INT, 220);
+		declareParam(s_streamFrequency, DataType.INT, 210);
 		declareParam(i_startMPPRCT, DataType.INT, 1);
-		declareParam(i_endMPPRCT, DataType.INT, 8);
+		declareParam(i_endMPPRCT, DataType.INT, 4);
 		declareParam(i_MPPRThreads, DataType.INT, 2);
 //		declareDerivedParam(s_twofreq, DataType.INT);
 	}

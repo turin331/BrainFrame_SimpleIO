@@ -78,6 +78,10 @@ class infoliKernel extends Kernel {
 		//Offset for WrapPoint
 		OffsetExpr GapJWrapLoop = stream.makeOffsetAutoLoop("GapJWrapLoop");
 
+		//Offset for GP value accumulation
+		OffsetExpr AccuVOff = stream.makeOffsetAutoLoop("AccuVOff");
+		OffsetExpr AccuFOff = stream.makeOffsetAutoLoop("AccuFOff");
+
 
 
 		//counters for execution iteration monitoring
@@ -130,6 +134,13 @@ class infoliKernel extends Kernel {
 		Memory<DFEVar> StateRamSodiumMA0 = mem.alloc(floatType,NetMaxSize);
 		Memory<DFEVar> StateRamSodiumHA0 = mem.alloc(floatType,NetMaxSize);
 		Memory<DFEVar> StateRamPotassiumXA0 = mem.alloc(floatType,NetMaxSize);
+
+		//Brams to accumulate GP connectivity
+		Memory<DFEVar> AccuV = mem.alloc(floatType,NetMaxSize);
+		Memory<DFEVar> AccuF = mem.alloc(floatType,NetMaxSize);
+
+
+
 
 
 		//Bram address controlled by neuron number
@@ -232,6 +243,10 @@ class infoliKernel extends Kernel {
 		DFEVar f 				= floatType.newInstance(this);
 		DFEVar FaccComp 		= constant.var(floatType, 0);
 		DFEVar VaccComp 		= constant.var(floatType, 0);
+		DFEVar FaccCompAcc 		= floatType.newInstance(this);
+		DFEVar VaccCompAcc 		= floatType.newInstance(this);
+		DFEVar FaccCompAccOld 		= floatType.newInstance(this);
+		DFEVar VaccCompAccOld 		= floatType.newInstance(this);
 
 
 		DFEVar V 				= floatType.newInstance(this);
@@ -239,45 +254,61 @@ class infoliKernel extends Kernel {
 
 		DFEVar [] Facc 			= new DFEVar[UnrollFactor];
 		DFEVar [] Vacc 			= new DFEVar[UnrollFactor];
-		DFEVar [] Facc_p 		= new DFEVar[UnrollFactor];
-		DFEVar [] Vacc_p 		= new DFEVar[UnrollFactor];
+
 
 		//========================IC Gap Junction Computation==================================//
 		// SCHWEIGHOFER 2004 VERSION
 
 
-		FaccComp = GapJunctionInterations.eq(0)  ? constant.var(floatType, 0) : stream.offset(FaccComp, -1);
-		VaccComp = GapJunctionInterations.eq(0)  ? constant.var(floatType, 0) : stream.offset(VaccComp, -1);
 
 
 		for(int i=0 ; i < UnrollFactor; i++){
-			Facc[i] = constant.var(floatType, 0);
-			Vacc[i] = constant.var(floatType, 0);
-			Facc_p[i] = GapJunctionInterations.eq(0)  ? constant.var(floatType, 0) : stream.offset(Facc[i], -1);
-			Vacc_p[i] = GapJunctionInterations.eq(0)  ? constant.var(floatType, 0) : stream.offset(Vacc[i], -1);
+
 
 			//Read neighbouring inputs from correct BRAMs
 			DFEVar ICAddress = GapJunctionInterations<NetSize/UnrollFactor ? GapJunctionInterations*UnrollFactor + i : NeuronNumber ;
 
 			DFEVar neighVdend =  ReadChoiceEnable.eq(true) ? StateRamVDend0.read(ICAddress.cast(dfeUInt(MathUtils.bitsToAddress(NetMaxSize)))) : StateRamVDend1.read(ICAddress.cast(dfeUInt(MathUtils.bitsToAddress(NetMaxSize)))) ;
-			DFEVar neighVdend_act = StepNumber.eq(0) ? IniVector[0] : neighVdend; //TODO Fix for first simStep for random ini
+			DFEVar neighVdend_act = StepNumber.eq(0) ? IniVector[0] : neighVdend;
 			V = PrevCellState[0] - neighVdend_act;
 
 			//debug.simPrintf(GapJunctionInterations<NetSize/UnrollFactor/*&StepNumber.eq(0) & NeuronNumber.eq(0)*/,"\n[address = %d ] VDend = %.8f\n",ICAddress,neighVdend_act  );
 
 
 			f = V * KernelMath.exp(-0.01 * V * V);
-			Facc[i] = f + Facc_p[i];
-			Vacc[i] = V + Vacc_p[i];
+			Facc[i] = f;
+			Vacc[i] = V;
 			//debug.simPrintf(GapJunctionInterations<NetSize/UnrollFactor/*&StepNumber.eq(0) & NeuronNumber.eq(0)*/,"\n[ Own = %.8f, Neigh = %.8f] ", Own_act,neighVdend_act  );
 
 			FaccComp += Facc[i];
 			VaccComp += Vacc[i];
+
 		}
 
 
+		VaccCompAccOld = GapJunctionInterations.eq(0)  ? constant.var(floatType, 0) : AccuV.read(stream.offset(NeuronNumber.cast(dfeUInt(MathUtils.bitsToAddress(NetMaxSize))), -AccuVOff));
 
-		IC = StepNumber.eq(0) ? ICInput : CONDUCTANCE * (8 * FaccComp + 2 * VaccComp) ;
+		VaccCompAcc = VaccCompAccOld + VaccComp ;
+
+
+		AccuV.write(stream.offset(NeuronNumber.cast(dfeUInt(MathUtils.bitsToAddress(NetMaxSize))), -AccuVOff),
+				stream.offset(VaccCompAcc, -AccuVOff),
+				stream.offset(GapJunctionInterations<NetSize/UnrollFactor, -AccuVOff));
+
+		FaccCompAccOld = GapJunctionInterations.eq(0)  ? constant.var(floatType, 0) : AccuF.read(stream.offset(NeuronNumber.cast(dfeUInt(MathUtils.bitsToAddress(NetMaxSize))), -AccuFOff));
+
+		FaccCompAcc = FaccCompAccOld + FaccComp ;
+
+		AccuF.write(stream.offset(NeuronNumber.cast(dfeUInt(MathUtils.bitsToAddress(NetMaxSize))), -AccuFOff),
+				stream.offset(FaccCompAcc, -AccuFOff),
+				stream.offset(GapJunctionInterations<NetSize/UnrollFactor, -AccuFOff));
+
+		FaccCompAcc.simWatch("FaccCompAcc");
+		VaccCompAcc.simWatch("VaccCompAcc");
+		//NeuronNumber.simWatch("NeuronNumber");
+
+		IC = StepNumber.eq(0) ? ICInput : CONDUCTANCE * (8 * FaccCompAcc + 2 * VaccCompAcc);
+		//IC.simWatch("IC");
 		//debug.simPrintf(/*GapJunctionInterations<NetSize/UnrollFactor&*/StepNumber.eq(0) & NeuronNumber.eq(0),"\n[IC = %.8f, FaccComp = %.8f , VaccComp = %.8f] ",IC, FaccComp, VaccComp  );
 		//debug.simPrintf(GapJunctionInterations.eq(NetSize/UnrollFactor-1) & StepNumber.eq(0) /*& NeuronNumber.eq(0)*/,"\n[IC = %.8f",IC );
 

@@ -111,7 +111,7 @@ public class infoliManager extends CustomManager {
 
 		InterfaceParam  zero = engine_interface.addConstant(0l);
 		//ticks
-		engine_interface.setTicks(s_kernelName, (N/UnrollFactor +(simsteps* engine_interface.getAutoLoopOffset(s_kernelName, "writeLoop0"))));
+		engine_interface.setTicks(s_kernelName, (N/UnrollFactor +(simsteps* (engine_interface.getAutoLoopOffset(s_kernelName, "writeLoop0")))));
 		//Scalar inputs
 		engine_interface.setScalar(s_kernelName, "N_size", N_size);
 		engine_interface.setScalar(s_kernelName, "simsteps", simsteps);

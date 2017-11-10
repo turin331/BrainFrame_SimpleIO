@@ -6,10 +6,11 @@
 #include "MaxSLiCInterface.h"
 
 
-#define SIMTIME 1000// in ms, for when no input file is provided
+#define SIMTIME 6000// in ms, for when no input file is provided
+
 //Change the Time Mux Factor to change the number of simulated cells in the network
 ////////------Keep Netwotk size in multiples of 96 cells for channel alignment----////////
-#define TIME_MUX_FACTOR 96
+#define TIME_MUX_FACTOR 384
 
 ///----DO NOT TOUCH defines after this point--///
 #define HW_CELLS 1
@@ -176,7 +177,7 @@ int main(void)
 	infoli_readLMem( simSteps * IO_NETWORK_SIZE ,(INI_PARAMETERS * (MaxNSize))+ (simSteps*(MaxNSize)), Out);
 
 //Write output to file
-/*	printf("Writing Output File\n");
+	printf("Writing Output File\n");
 	for (long i=0; i<simSteps ; i++){
 		sprintf(temp, "%ld %.2f ", i+1, iApp[i* IO_NETWORK_SIZE]);
     	fputs(temp, pOutFile);
@@ -190,7 +191,7 @@ int main(void)
     	fputs(temp, pOutFile);
 
 	}
-*/
+
 
 	//fclose (pOutFile);
 	printf("Done.\n");

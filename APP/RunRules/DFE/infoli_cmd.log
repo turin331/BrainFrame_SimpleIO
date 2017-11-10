@@ -1,62 +1,66 @@
-Apache Ant version 1.7.1 compiled on August 24 2010
+Apache Ant version 1.7.1 compiled on May 10 2016
 Buildfile: infoli.xml
-Detected Java version: 1.6 in: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.85.x86_64/jre
+Detected Java version: 1.7 in: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.111.x86_64/jre
 Detected OS: Linux
-parsing buildfile /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/infoli.xml with URI = file:/home/maxeler/workspace/Maxide%20projects%20Archive/InferiorOlive_0_7m/RunRules/DFE/infoli.xml
-Project base dir set to: /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/EngineCode
+parsing buildfile /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/infoli.xml with URI = file:/home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/infoli.xml
+Project base dir set to: /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/EngineCode
 [antlib:org.apache.tools.ant] Could not load definitions from resource org/apache/tools/ant/antlib.xml. It could not be found.
  [property] Loading Environment env.
 Property "-*-command-variables-*-" has not been set
 Property "env.MAXCOMPILERJCP" has not been set
 Property "env.CLASSPATH" has not been set
 Build sequence for target(s) `run' is [build, run]
-Complete build sequence is [build, run, help, clean, all, jar, ]
+Complete build sequence is [build, run, help, runresult, clean, all, jar, ]
 
 build:
-Detected Java version: 1.6 in: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.85.x86_64/jre
+Detected Java version: 1.7 in: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.111.x86_64/jre
 Detected OS: Linux
-      [ant] calling target(s) [default] in build file /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/infoli_Build.xml
-parsing buildfile /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/infoli_Build.xml with URI = file:/home/maxeler/workspace/Maxide%20projects%20Archive/InferiorOlive_0_7m/RunRules/DFE/infoli_Build.xml
-Project base dir set to: /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/EngineCode
+      [ant] calling target(s) [default] in build file /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/infoli_Build.xml
+parsing buildfile /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/infoli_Build.xml with URI = file:/home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/infoli_Build.xml
+Project base dir set to: /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/EngineCode
  [property] Loading Environment env.
 Property "-*-command-variables-*-" has not been set
 Property "env.MAXCOMPILERJCP" has not been set
 Property "env.CLASSPATH" has not been set
-      [ant] Entering /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/infoli_Build.xml...
+      [ant] Entering /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/infoli_Build.xml...
 Build sequence for target(s) `all' is [clean, build, all]
 Complete build sequence is [clean, build, all, ]
 
 clean:
-   [delete] Deleting directory /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/dist
-   [delete] Deleting directory /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin
-   [delete] Deleting directory /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/dist
+   [delete] Deleting directory /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/dist
+   [delete] Deleting /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin/infoli/infoliEngineParameters.class
+   [delete] Deleting /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin/infoli/infoliKernel.class
+   [delete] Deleting /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin/infoli/infoliManager.class
+   [delete] Deleting directory /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin/infoli
+   [delete] Deleting directory /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin
+   [delete] Deleting directory /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/dist
 
 build:
-    [mkdir] Created dir: /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/dist
-    [mkdir] Created dir: /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin
+    [mkdir] Created dir: /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/dist
+    [mkdir] Created dir: /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin
      [copy] No sources found.
 Property "EnvClassPath" has not been set
 [maxjcompiler] 
 [maxjcompiler] 
-[maxjcompiler] Compiling to folder /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin
+[maxjcompiler] Compiling to folder /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin
 [maxjcompiler] 
 [maxjcompiler] Compiling files and folders:
-[maxjcompiler] /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/EngineCode/src
+[maxjcompiler] /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/EngineCode/src
 [maxjcompiler] 
 [maxjcompiler] Compiler options:
 [maxjcompiler] -noExit
 [maxjcompiler] -classpath
-[maxjcompiler] /opt/maxeler/maxcompiler-2014.1.1/lib/MaxCompiler.jar:/home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/EngineCode/${EnvClassPath}
+[maxjcompiler] /opt/maxeler/maxcompiler-2014.1.1/lib/MaxCompiler.jar:/home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/EngineCode/${EnvClassPath}
 [maxjcompiler] -d
-[maxjcompiler] /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin
-[maxjcompiler] incorrect classpath: /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/EngineCode/${EnvClassPath}
+[maxjcompiler] /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin
+[maxjcompiler] incorrect classpath: /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/EngineCode/${EnvClassPath}
 [maxjcompiler] ----------
-[maxjcompiler] 1. WARNING in /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/EngineCode/src/infoli/infoliKernel.maxj (at line 38)
+[maxjcompiler] 1. WARNING in /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/EngineCode/src/infoli/infoliKernel.maxj (at line 38)
 [maxjcompiler] 	DFEVar TimeMuxFactor = io.scalarInput("time_mux_factor", typeInt64);
 [maxjcompiler] 	       ^^^^^^^^^^^^^
 [maxjcompiler] The local variable TimeMuxFactor is never read
 [maxjcompiler] ----------
-[maxjcompiler] 2. WARNING in /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/EngineCode/src/infoli/infoliKernel.maxj (at line 39)
+[maxjcompiler] 2. WARNING in /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/EngineCode/src/infoli/infoliKernel.maxj (at line 39)
 [maxjcompiler] 	DFEVar MaxNSize = io.scalarInput("Max_N_Size", typeInt64);
 [maxjcompiler] 	       ^^^^^^^^
 [maxjcompiler] The local variable MaxNSize is never read
@@ -64,103 +68,99 @@ Property "EnvClassPath" has not been set
 [maxjcompiler] 2 problems (2 warnings)
 
 all:
-      [ant] Exiting /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/infoli_Build.xml.
+      [ant] Exiting /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/infoli_Build.xml.
 
 run:
 Property "EnvClassPath" has not been set
-dropping /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/EngineCode/${EnvClassPath} from path as it doesn't exist
-dropping /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/EngineCode/${EnvClassPath} from path as it doesn't exist
-     [java] Executing '/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.85.x86_64/jre/bin/java' with arguments:
+dropping /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/EngineCode/${EnvClassPath} from path as it doesn't exist
+dropping /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/EngineCode/${EnvClassPath} from path as it doesn't exist
+     [java] Executing '/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.111.x86_64/jre/bin/java' with arguments:
      [java] '-Xmx2048m'
      [java] '-classpath'
-     [java] '/home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin:/opt/maxeler/maxcompiler-2014.1.1/lib/MaxCompiler.jar'
+     [java] '/home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/dist/bin:/opt/maxeler/maxcompiler-2014.1.1/lib/MaxCompiler.jar'
      [java] 'infoli.infoliManager'
      [java] 
      [java] The ' characters around the executable and arguments are
      [java] not part of the command.
-dropping /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/EngineCode/${EnvClassPath} from path as it doesn't exist
-dropping /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/EngineCode/${EnvClassPath} from path as it doesn't exist
+dropping /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/EngineCode/${EnvClassPath} from path as it doesn't exist
+dropping /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/EngineCode/${EnvClassPath} from path as it doesn't exist
      [java] Setting environment variable: MAXSOURCEDIRS=src
-     [java] Mon 10:08: MaxCompiler version: 2014.1.1
-     [java] Mon 10:08: Build "infoli" start time: Mon Jan 18 10:08:44 GMT 2016
-     [java] Mon 10:08: Main build process running as user maxeler on host MaxelerBox.neuroscience
-     [java] Mon 10:08: Build location: /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/maxfiles/infoli_DFE_ss220
-     [java] Mon 10:08: Detailed build log available in "_build.log"
-     [java] Mon 10:08: 
-     [java] Mon 10:08: ENGINE BUILD PARAMETERS
-     [java] Mon 10:08: 	        Build name: infoli_DFE_ss220
-     [java] Mon 10:08: 	          DFEModel: MAIA            
-     [java] Mon 10:08: 	       maxFileName: infoli          
-     [java] Mon 10:08: 	            target: DFE             
-     [java] Mon 10:08: 	        enableMPCX: true            
-     [java] Mon 10:08: 	       MPPRStartCT: 1               
-     [java] Mon 10:08: 	         MPPREndCT: 1               
-     [java] Mon 10:08: 	       MPPRThreads: 2               
-     [java] Mon 10:08: 	MPPRRetryThreshold: 0               
-     [java] Mon 10:08: 	   streamFrequency: 220             
-     [java] Mon 10:08: 	       startMPPRCT: 1               
-     [java] Mon 10:08: 	         endMPPRCT: 8               
-     [java] Mon 10:08: Instantiating kernel "infoliKernel"
-     [java] Mon 10:08: WARNING: Floating-point casts ignore set rounding mode and use TONEAREVEN rounding only.
-     [java] Mon 10:08: 
-     [java] Mon 10:08: Compiling kernel "infoliKernel"
-     [java] Mon 10:08: WARNING: Warning (UNCONNECTED_DESIGN_ELEMENT):
-     [java] Mon 10:08: WARNING: Unconnected elements in design 'infoliKernel'
-     [java] Mon 10:08: WARNING: details in : /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/maxfiles/infoli_DFE_ss220/scratch/infoliKernel_graph_warnings.txt
-     [java] Mon 10:08: WARNING: Warning (MULTIPLY_ADD_EXTRACTION):
-     [java] Mon 10:08: WARNING: MaxCompiler has detected and optimized one or more multiply add trees. These
-     [java] Mon 10:08: WARNING: optimizations reduce the amount of rounding that takes place. This will improve
-     [java] Mon 10:08: WARNING: precision but may mean that the output of this bitstream is not bit-identical
-     [java] Mon 10:08: WARNING: to that of a similar bitstream.
-     [java] Mon 10:08: WARNING: Warning (CONSTANT_ENCODING):
-     [java] Mon 10:08: WARNING: Precision loss occurred in some constant values.
-     [java] Mon 10:08: WARNING: For details see /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/maxfiles/infoli_DFE_ss220/scratch/infoliKernel_constants_report.txt
-     [java] Mon 10:09: Generating input files (VHDL, netlists, MegaWizard/CoreGen)
-     [java] Mon 10:09: Running back-end  build (16 phases)
-     [java] Mon 10:09: (1/16) - Prepare MaxFile Data (GenerateMaxFileDataFile)
-     [java] Mon 10:09: (2/16) - Prepare for Placement (QuartusMap)
-     [java] Mon 10:10: (3/16) - Generate Incremental Netlist (QuartusCdb)
-     [java] Mon 10:10: (4/16) - Generate Resource Report (AlteraResourceUsageBuildPass)
-     [java] Mon 10:10: (5/16) - Generate Annotated Source Code (AlteraResourceAnnotationBuildPass)
-     [java] Mon 10:11: (6/16) - Analyse Resource Usage (AlteraResourceCounterPass)
-     [java] Mon 10:11: 
-     [java] Mon 10:11: About to start chip vendor Map/Place/Route toolflow. This will take some time.
-     [java] Mon 10:11: For this compile, we estimate this process may take longer than 1 hour.
-     [java] Mon 10:11: We recommend running in simulation to verify correctness before building hardware.
-     [java] Mon 10:11: 
-     [java] Mon 10:11: PRELIMINARY RESOURCE USAGE
-     [java] Mon 10:11: Logic utilization:     228513 / 262400   (87.09%)
-     [java] Mon 10:11: Multipliers (18x18):      585 / 3926     (14.90%)
-     [java] Mon 10:11: Block memory (bits): 19944554 / 52572160 (37.94%)
-     [java] Mon 10:11: 
-     [java] Mon 10:11: (7/16) - Place and Route DFE (AlteraMPPR)
-     [java] Mon 10:11: Executing MPPR with 8 cost tables and 2 threads.
-     [java] Mon 10:11: MPPR: Starting 8 cost tables
-     [java] Mon 10:13: MPPR: Cost table 1 failed timing with score 11232 (best score 11232)
-     [java] Mon 10:13: MPPR: Cost table 2 failed timing with score 12158 (best score 11232)
-     [java] Mon 10:14: MPPR: Cost table 3 failed timing with score 24706 (best score 11232)
-     [java] Mon 10:14: MPPR: Cost table 4 failed timing with score 13525 (best score 11232)
-     [java] Mon 10:15: MPPR: Cost table 5 met timing with score 0 (best score 0)
-     [java] Mon 10:15: (8/16) - Generate Configuration (QuartusAsm)
-     [java] Mon 10:17: (9/16) - Convert Programming File (QuartusCpf)
-     [java] Mon 10:17: (10/16) - Update Checksum (UpdateChecksumBuildPass)
-     [java] Mon 10:17: (11/16) - Generate Incremental Netlist (QuartusCdb)
-     [java] Mon 10:17: (12/16) - Generate Configuration (QuartusAsm)
-     [java] Mon 10:17: (13/16) - Convert Programming File (QuartusCpf)
-     [java] Mon 10:17: (14/16) - Generate Resource Report (AlteraResourceUsageBuildPass)
-     [java] Mon 10:18: (15/16) - Generate Annotated Source Code (AlteraResourceAnnotationBuildPass)
-     [java] Mon 10:19: (16/16) - Generate MaxFile (GenerateMaxFileAltera)
-     [java] Mon 10:19: 
-     [java] Mon 10:19: FINAL RESOURCE USAGE
-     [java] Mon 10:19: Logic utilization:   201074 / 262400 (76.63%)
-     [java] Mon 10:19:   Primary FFs:       361372 / 524800 (68.86%)
-     [java] Mon 10:19:   Secondary FFs:      19943 / 524800 (3.80%)
-     [java] Mon 10:19: Multipliers (18x18):    585 / 3926   (14.90%)
-     [java] Mon 10:19:   DSP blocks:           311 / 1963   (15.84%)
-     [java] Mon 10:19: Block memory (M20K):   2434 / 2567   (94.82%)
-     [java] Mon 10:19: 
-     [java] Mon 10:19: MaxFile: /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/RunRules/DFE/maxfiles/infoli_DFE_ss220/results/infoli.max (MD5Sum: ec3150be644721e36c492de41efbfcff)
-     [java] Mon 10:19: Build completed: Mon Jan 18 10:19:06 GMT 2016 (took 10 mins, 22 secs)
+     [java] Mon 14:08: MaxCompiler version: 2014.1.1
+     [java] Mon 14:08: Build "infoli" start time: Mon Jun 19 14:08:21 BST 2017
+     [java] Mon 14:08: Main build process running as user maxeler on host MaxelerBox.neuroscience
+     [java] Mon 14:08: Build location: /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/maxfiles/infoli_DFE_ss210
+     [java] Mon 14:08: Detailed build log available in "_build.log"
+     [java] Mon 14:08: 
+     [java] Mon 14:08: ENGINE BUILD PARAMETERS
+     [java] Mon 14:08: 	        Build name: infoli_DFE_ss210
+     [java] Mon 14:08: 	          DFEModel: MAIA            
+     [java] Mon 14:08: 	       maxFileName: infoli          
+     [java] Mon 14:08: 	            target: DFE             
+     [java] Mon 14:08: 	        enableMPCX: true            
+     [java] Mon 14:08: 	       MPPRStartCT: 1               
+     [java] Mon 14:08: 	         MPPREndCT: 1               
+     [java] Mon 14:08: 	       MPPRThreads: 2               
+     [java] Mon 14:08: 	MPPRRetryThreshold: 0               
+     [java] Mon 14:08: 	   streamFrequency: 210             
+     [java] Mon 14:08: 	       startMPPRCT: 1               
+     [java] Mon 14:08: 	         endMPPRCT: 4               
+     [java] Mon 14:08: Instantiating kernel "infoliKernel"
+     [java] Mon 14:08: WARNING: Floating-point casts ignore set rounding mode and use TONEAREVEN rounding only.
+     [java] Mon 14:08: 
+     [java] Mon 14:08: Compiling kernel "infoliKernel"
+     [java] Mon 14:08: WARNING: Warning (UNCONNECTED_DESIGN_ELEMENT):
+     [java] Mon 14:08: WARNING: Unconnected elements in design 'infoliKernel'
+     [java] Mon 14:08: WARNING: details in : /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/maxfiles/infoli_DFE_ss210/scratch/infoliKernel_graph_warnings.txt
+     [java] Mon 14:08: WARNING: Warning (MULTIPLY_ADD_EXTRACTION):
+     [java] Mon 14:08: WARNING: MaxCompiler has detected and optimized one or more multiply add trees. These
+     [java] Mon 14:08: WARNING: optimizations reduce the amount of rounding that takes place. This will improve
+     [java] Mon 14:08: WARNING: precision but may mean that the output of this bitstream is not bit-identical
+     [java] Mon 14:08: WARNING: to that of a similar bitstream.
+     [java] Mon 14:08: WARNING: Warning (CONSTANT_ENCODING):
+     [java] Mon 14:08: WARNING: Precision loss occurred in some constant values.
+     [java] Mon 14:08: WARNING: For details see /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/maxfiles/infoli_DFE_ss210/scratch/infoliKernel_constants_report.txt
+     [java] Mon 14:08: Generating input files (VHDL, netlists, MegaWizard/CoreGen)
+     [java] Mon 14:08: Running back-end  build (16 phases)
+     [java] Mon 14:08: (1/16) - Prepare MaxFile Data (GenerateMaxFileDataFile)
+     [java] Mon 14:08: (2/16) - Prepare for Placement (QuartusMap)
+     [java] Mon 14:09: (3/16) - Generate Incremental Netlist (QuartusCdb)
+     [java] Mon 14:09: (4/16) - Generate Resource Report (AlteraResourceUsageBuildPass)
+     [java] Mon 14:09: (5/16) - Generate Annotated Source Code (AlteraResourceAnnotationBuildPass)
+     [java] Mon 14:10: (6/16) - Analyse Resource Usage (AlteraResourceCounterPass)
+     [java] Mon 14:10: 
+     [java] Mon 14:10: About to start chip vendor Map/Place/Route toolflow. This will take some time.
+     [java] Mon 14:10: For this compile, we estimate this process may take longer than 1 hour.
+     [java] Mon 14:10: We recommend running in simulation to verify correctness before building hardware.
+     [java] Mon 14:10: 
+     [java] Mon 14:10: PRELIMINARY RESOURCE USAGE
+     [java] Mon 14:10: Logic utilization:     220383 / 262400   (83.99%)
+     [java] Mon 14:10: Multipliers (18x18):      585 / 3926     (14.90%)
+     [java] Mon 14:10: Block memory (bits): 20430709 / 52572160 (38.86%)
+     [java] Mon 14:10: 
+     [java] Mon 14:10: (7/16) - Place and Route DFE (AlteraMPPR)
+     [java] Mon 14:10: Executing MPPR with 4 cost tables and 2 threads.
+     [java] Mon 14:10: MPPR: Starting 4 cost tables
+     [java] Mon 14:11: MPPR: Cost table 1 met timing with score 0 (best score 0)
+     [java] Mon 14:11: (8/16) - Generate Configuration (QuartusAsm)
+     [java] Mon 14:12: (9/16) - Convert Programming File (QuartusCpf)
+     [java] Mon 14:13: (10/16) - Update Checksum (UpdateChecksumBuildPass)
+     [java] Mon 14:13: (11/16) - Generate Incremental Netlist (QuartusCdb)
+     [java] Mon 14:13: (12/16) - Generate Configuration (QuartusAsm)
+     [java] Mon 14:13: (13/16) - Convert Programming File (QuartusCpf)
+     [java] Mon 14:13: (14/16) - Generate Resource Report (AlteraResourceUsageBuildPass)
+     [java] Mon 14:13: (15/16) - Generate Annotated Source Code (AlteraResourceAnnotationBuildPass)
+     [java] Mon 14:14: (16/16) - Generate MaxFile (GenerateMaxFileAltera)
+     [java] Mon 14:14: 
+     [java] Mon 14:14: FINAL RESOURCE USAGE
+     [java] Mon 14:14: Logic utilization:   194115 / 262400 (73.98%)
+     [java] Mon 14:14:   Primary FFs:       348429 / 524800 (66.39%)
+     [java] Mon 14:14:   Secondary FFs:      18329 / 524800 (3.49%)
+     [java] Mon 14:14: Multipliers (18x18):    585 / 3926   (14.90%)
+     [java] Mon 14:14:   DSP blocks:           311 / 1963   (15.84%)
+     [java] Mon 14:14: Block memory (M20K):   2396 / 2567   (93.34%)
+     [java] Mon 14:14: 
+     [java] Mon 14:14: MaxFile: /home/maxeler/workspace/Maxide_projects_Archive/InferiorOlive_0_7m/RunRules/DFE/maxfiles/infoli_DFE_ss210/results/infoli.max (MD5Sum: 88dfc867dce7a51a959beaedb3875e0f)
+     [java] Mon 14:14: Build completed: Mon Jun 19 14:14:35 BST 2017 (took 6 mins, 14 secs)
      [exec] Current OS is Linux
      [exec] Executing '/opt/maxeler/maxcompiler-2014.1.1/lib/MaxIDE/copyBuildResults.sh' with arguments:
      [exec] '-p'
@@ -168,8 +168,6 @@ dropping /home/maxeler/workspace/Maxide projects Archive/InferiorOlive_0_7m/Engi
      [exec] 
      [exec] The ' characters around the executable and arguments are
      [exec] not part of the command.
-     [exec] RunRule Directory '/home/maxeler/workspace/Maxide' does not exist!
-     [exec] Result: 1
 
 BUILD SUCCESSFUL
-Total time: 10 minutes 23 seconds
+Total time: 6 minutes 16 seconds
