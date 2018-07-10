@@ -3,6 +3,7 @@ package infoli;
 import com.maxeler.maxcompiler.v2.kernelcompiler.Kernel;
 import com.maxeler.maxcompiler.v2.kernelcompiler.KernelParameters;
 import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.KernelMath;
+import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.LMemCommandStream;
 import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.core.CounterChain;
 import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.core.Stream.OffsetExpr;
 import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.memory.Memory;
@@ -28,6 +29,7 @@ class infoliKernel extends Kernel {
 		optimization.pushPipeliningFactor(0.8);// Push build to reduce resources
 		///---kernel hardcoded parameters DO NOT TOUCH---///
 		int StatePamaterers = 19;
+		//int NeuronCharPamaterers = 20;
 		int NetMaxSize = 7680;
 		int UnrollFactor = 16;  //Make sure this has the same value in the kernel code and manager (UnrollFactor)
 
@@ -36,6 +38,7 @@ class infoliKernel extends Kernel {
 		DFEVar NetSize = io.scalarInput("N_size", typeInt64);
 		DFEVar SimSteps = io.scalarInput("simsteps", typeInt64);
 		DFEVar TimeMuxFactor = io.scalarInput("time_mux_factor", typeInt64);
+		DFEVar BytesPerBursts = io.scalarInput("BytesPerBursts", typeInt64);
 		DFEVar MaxNSize = io.scalarInput("Max_N_Size", typeInt64);
 		//Declaration of Vector types (stored state and ini state)
 		final DFEVectorType<DFEVar> IniVectorType =
@@ -44,6 +47,11 @@ class infoliKernel extends Kernel {
 		final DFEVectorType<DFEVar> StateVectorType =
 			new DFEVectorType<DFEVar>(floatType, 19);
 
+		final DFEVectorType<DFEVar> IniNeuronCharVectorType =
+			new DFEVectorType<DFEVar>(floatType, 24);
+
+		final DFEVectorType<DFEVar> ConnVectorType =
+			new DFEVectorType<DFEVar>(floatType, UnrollFactor);
 
 
 		//State handling vectors
@@ -75,13 +83,13 @@ class infoliKernel extends Kernel {
 
 		//Offset Length for VDend BRAM MUX
 		OffsetExpr VDLoop = stream.makeOffsetAutoLoop("VDLoop");
-		//Offset for WrapPoint
+		//Offset for execution WrapPoint
 		OffsetExpr GapJWrapLoop = stream.makeOffsetAutoLoop("GapJWrapLoop");
-
+		//Offset for Neuron conductacnce steam  WrapPoint
+		OffsetExpr NeurNWrapLoop = stream.makeOffsetAutoLoop("NeurNWrapLoop");
 		//Offset for GP value accumulation
 		OffsetExpr AccuVOff = stream.makeOffsetAutoLoop("AccuVOff");
 		OffsetExpr AccuFOff = stream.makeOffsetAutoLoop("AccuFOff");
-
 
 
 		//counters for execution iteration monitoring
@@ -91,6 +99,23 @@ class infoliKernel extends Kernel {
 		DFEVar GapJWrap =  NeuronNumber.eq(NetSize-1) ? NetSize/UnrollFactor + writeLoop0.getDFEVar(this, dfeUInt(64)) : NetSize/UnrollFactor;
 		DFEVar GapJWrapOffset = stream.offset(GapJWrap, -GapJWrapLoop);
 		DFEVar GapJunctionInterations = chain.addCounter(GapJWrapOffset, 1);
+
+		//counters for connectivity command stream (to control activation and addressing)
+		CounterChain MemChain 	= control.count.makeCounterChain();
+		DFEVar BurstCountWrap = GapJunctionInterations < NetSize/UnrollFactor ? (NetSize*NetSize*4)/BytesPerBursts : 0;
+		DFEVar BurstCount = MemChain.addCounter(BurstCountWrap,1);
+		DFEVar ByteCountWrap = GapJunctionInterations < NetSize/UnrollFactor ? (BytesPerBursts/(UnrollFactor*4)) : 0;
+		DFEVar ByteCount = MemChain.addCounter(ByteCountWrap,1);
+
+
+		//counters for Neuron Conductances command stream (to control activation and addressing)
+		CounterChain NeurCondMemChain 	= control.count.makeCounterChain();
+		DFEVar NeurCondBurstCountWrap = GapJunctionInterations < NetSize/UnrollFactor ? (24*NetSize*4)/BytesPerBursts : 0;
+		DFEVar NeurCondBurstCount = NeurCondMemChain.addCounter(NeurCondBurstCountWrap,1);
+		DFEVar NeurCondByteCountWrap = GapJunctionInterations < NetSize/UnrollFactor ? (BytesPerBursts/(24*4)) : 0;
+		DFEVar NeurCondByteCount = NeurCondMemChain.addCounter(NeurCondByteCountWrap,1);
+		DFEVar NeuronShiftCount = NeurCondMemChain.addCounter(GapJWrapOffset,1); // Delaying previous counter until a new neuron begins simulation.
+
 
 
 
@@ -105,8 +130,81 @@ class infoliKernel extends Kernel {
 
 		//Input Streams
 		DFEVector<DFEVar> IniVector = io.input("Ini", IniVectorType, (StepNumber === 0 & GapJunctionInterations === 0));
+		//DFEVector<DFEVar> NeuronCharVector = io.input("NeuronChar", IniNeuronCharVectorType, (GapJunctionInterations === 0 & StepNumber===0 & NeuronNumber === 0) );
 		DFEVar iAppInput = io.input("iApp", floatType, GapJunctionInterations === 0 & StepNumber!==SimSteps );
 		DFEVar ICInput = io.input("IC", floatType, StepNumber === 0 & GapJunctionInterations === 0 );
+
+
+		//Connectivity Matrix custom Stream
+
+		DFEVar ConnStartAddress = ((24*NetMaxSize) + (NetMaxSize*SimSteps)+NetMaxSize+(NetMaxSize*24))*4/BytesPerBursts;
+
+		DFEVar ConnReadAdress = ConnStartAddress+(BurstCount);
+
+
+		//ConnReadAdress.simWatch("ConnReadAdress");
+		//GapJunctionInterations.simWatch("GapJunctionInterations");
+		//StepNumber.simWatch("StepNumber");
+		//NeuronNumber.simWatch("NeuronNumber");
+		BurstCount.simWatch("BurstCount");
+		ByteCount.simWatch("ByteCount");
+
+		DFEVector<DFEVar>  ConnVector = io.input("Conn", ConnVectorType,StepNumber < SimSteps & GapJunctionInterations < NetSize/UnrollFactor);
+
+		io.forceExactIOSeparation("Conn", "ConnStream", -64);
+
+
+		LMemCommandStream.makeKernelOutput("ConnStream",
+				ByteCount === 0 & GapJunctionInterations < NetSize/UnrollFactor,    									// control
+				(ConnReadAdress).cast(dfeUInt(28)),      																// address - start address in LMEM + offset for connectivity of the executing neuron
+				constant.var(dfeUInt(8), 1),		    												    			// burst size -
+				constant.var(dfeUInt(7), 0),      																		// inc
+				constant.var(dfeUInt(4),0),      																		// stream
+				constant.var(false) ) ;
+
+
+		//ConnVector.simWatch("ConnVector");
+
+		//debug.simPrintf(GapJunctionInterations.eq(0),"Conn = [%f] \n",ConnVector[0]);
+
+
+		//Neuron Conductances custom Stream
+
+		DFEVar NeurCondStartAddress = (((24*NetMaxSize) + (NetMaxSize*SimSteps)+NetMaxSize)*4)/BytesPerBursts;
+
+
+
+		DFEVar NeurCondReadAdress = NeurCondStartAddress+(NeurCondBurstCount);
+
+
+
+		NeurCondReadAdress.simWatch("NeurCondReadAdress");
+		GapJunctionInterations.simWatch("GapJunctionInterations");
+		StepNumber.simWatch("StepNumber");
+		//NeuronNumber.simWatch("NeuronNumber");
+		//NeurCondBurstCount.simWatch("NeurCondBurstCount");
+		//NeurCondByteCount.simWatch("NeurCondByteCount");
+		//NeuronShiftCount.simWatch("NeuronShiftCount");
+
+
+		DFEVector<DFEVar>  NeuronCharVector = io.input("NeuronChar", IniNeuronCharVectorType,StepNumber < SimSteps & GapJunctionInterations < NetSize/UnrollFactor & GapJunctionInterations.eq(0) );
+
+		io.forceExactIOSeparation("NeuronChar", "NeurCondStream", -64);
+
+
+		LMemCommandStream.makeKernelOutput("NeurCondStream",
+				NeuronShiftCount === 0 & NeurCondByteCount === 0 & GapJunctionInterations < NetSize/UnrollFactor,    	// control
+				(NeurCondReadAdress).cast(dfeUInt(28)),      															// address - start address in LMEM + offset for conductances of the executing neuron
+				constant.var(dfeUInt(8), 1),		    												    			// burst size -
+				constant.var(dfeUInt(7), 0),      																		// inc
+				constant.var(dfeUInt(4),0),      																		// stream
+				constant.var(false) ) ;
+
+
+		//NeuronCharVector.simWatch("NeuronCharVector");
+
+
+
 
 		//BRAM0 storing dendrite parameters Extra cell used as neighbouring input source
 		Memory<DFEVar> StateRamVDend0 = mem.alloc(floatType,NetMaxSize);
@@ -138,9 +236,6 @@ class infoliKernel extends Kernel {
 		//Brams to accumulate GP connectivity
 		Memory<DFEVar> AccuV = mem.alloc(floatType,NetMaxSize);
 		Memory<DFEVar> AccuF = mem.alloc(floatType,NetMaxSize);
-
-
-
 
 
 		//Bram address controlled by neuron number
@@ -199,45 +294,44 @@ class infoliKernel extends Kernel {
 		DFEVar DELTA = constant.var(floatType, 0.05);
 
 		//Gap Junction Conductance
-		DFEVar CONDUCTANCE		= constant.var(floatType, .004);
+		//DFEVar CONDUCTANCE		= constant.var(floatType, .004);
 
 		// Capacitance
-		DFEVar C_M = constant.var(floatType, 1);
+		DFEVar C_M = NeuronCharVector[0];
 
 		// Somatic conductances (mS/cm2)
-		DFEVar G_NA_S = constant.var(floatType, 150);     // Na gate conductance (=90 in Schweighofer code, 70 in paper) 120 too little
-		DFEVar G_KDR_S = constant.var(floatType, 9.0);   // K delayed rectifier gate conductance (alternative value: 18)
-		DFEVar G_K_S = constant.var(floatType, 5);     // Voltage-dependent (fast) potassium
-		DFEVar G_LS = constant.var(floatType, 0.016);// Leak conductance (0.015)
+		DFEVar G_NA_S = NeuronCharVector[1];     // Na gate conductance (=90 in Schweighofer code, 70 in paper) 120 too little
+		DFEVar G_KDR_S = NeuronCharVector[2];   // K delayed rectifier gate conductance (alternative value: 18)
+		DFEVar G_K_S = NeuronCharVector[3];     // Voltage-dependent (fast) potassium
+		DFEVar G_LS = NeuronCharVector[4];// Leak conductance (0.015)
 
 		// Dendritic conductances (mS/cm2)
-		DFEVar G_K_CA = constant.var(floatType, 35);       // Potassium gate conductance (35)
-		DFEVar G_CAH = constant.var(floatType, 4.5);     // High-threshold Ca gate conductance (4.5)
-		DFEVar G_LD = constant.var(floatType, 0.016);   // Dendrite leak conductance (0.015)
-		DFEVar G_H = constant.var(floatType, 0.125);    // H current gate conductance (1.5) (0.15 in SCHWEIGHOFER 2004)
+		DFEVar G_K_CA = NeuronCharVector[5];       // Potassium gate conductance (35)
+		DFEVar G_CAH = NeuronCharVector[6];     // High-threshold Ca gate conductance (4.5)
+		DFEVar G_LD = NeuronCharVector[7];   // Dendrite leak conductance (0.015)
+		DFEVar G_H = NeuronCharVector[8];    // H current gate conductance (1.5) (0.15 in SCHWEIGHOFER 2004)
 
 		// Axon hillock conductances (mS/cm2)
-		DFEVar G_NA_A = constant.var(floatType, 240);      // Na gate conductance (according to literature: 100 to 200 times as big as somatic conductance)
+		DFEVar G_NA_A = NeuronCharVector[9];      // Na gate conductance (according to literature: 100 to 200 times as big as somatic conductance)
 		//DFEVar G_NA_R = constant.var(floatType, 0);      // Na (resurgent) gate conductance
-		DFEVar G_K_A = constant.var(floatType, 20);      // K voltage-dependent
-		DFEVar G_LA = constant.var(floatType, 0.016);  // Leak conductance
+		DFEVar G_K_A = NeuronCharVector[10];     // K voltage-dependent
+		DFEVar G_LA = NeuronCharVector[11];  // Leak conductance
 
 		// Cell morphology
-		DFEVar P1 = constant.var(floatType, 0.25);        // Cell surface ratio soma/dendrite (0.2)
-		DFEVar P2 = constant.var(floatType, 0.15);      // Cell surface ratio axon(hillock)/soma (0.1)
-		DFEVar G_INT = constant.var(floatType, 0.13);       // Cell internal conductance (0.13)
+		DFEVar P1 = NeuronCharVector[12];        // Cell surface ratio soma/dendrite (0.2)
+		DFEVar P2 = NeuronCharVector[13];      // Cell surface ratio axon(hillock)/soma (0.1)
+		DFEVar G_INT = NeuronCharVector[14];       // Cell internal conductance (0.13)
 
 		// Reversal potentials
-		DFEVar V_NA = constant.var(floatType, 55);       // Na reversal potential (55)
-		DFEVar V_K = constant.var(floatType, -75);       // K reversal potential
-		DFEVar V_CA = constant.var(floatType, 120);       // Ca reversal potential (120)
-		DFEVar V_H = constant.var(floatType, -43);       // H current reversal potential
-		DFEVar V_L = constant.var(floatType, 10);       // leak current
+		DFEVar V_NA = NeuronCharVector[15];       // Na reversal potential (55)
+		DFEVar V_K = NeuronCharVector[16];       // K reversal potential
+		DFEVar V_CA = NeuronCharVector[17];       // Ca reversal potential (120)
+		DFEVar V_H = NeuronCharVector[18];      // H current reversal potential
+		DFEVar V_L = NeuronCharVector[19];       // leak current
 
 
 
 		//======================== IC (Gap Junction) VARIABLES====================================//
-
 
 
 		DFEVar f 				= floatType.newInstance(this);
@@ -254,7 +348,6 @@ class infoliKernel extends Kernel {
 
 		DFEVar [] Facc 			= new DFEVar[UnrollFactor];
 		DFEVar [] Vacc 			= new DFEVar[UnrollFactor];
-
 
 		//========================IC Gap Junction Computation==================================//
 		// SCHWEIGHOFER 2004 VERSION
@@ -276,15 +369,15 @@ class infoliKernel extends Kernel {
 
 
 			f = V * KernelMath.exp(-0.01 * V * V);
-			Facc[i] = f;
-			Vacc[i] = V;
+			Facc[i] = ConnVector[i] *f ;
+			Vacc[i] = ConnVector[i] *V ;
 			//debug.simPrintf(GapJunctionInterations<NetSize/UnrollFactor/*&StepNumber.eq(0) & NeuronNumber.eq(0)*/,"\n[ Own = %.8f, Neigh = %.8f] ", Own_act,neighVdend_act  );
 
-			FaccComp += Facc[i];
-			VaccComp += Vacc[i];
+			FaccComp +=  Facc[i];
+			VaccComp +=  Vacc[i];
+
 
 		}
-
 
 		VaccCompAccOld = GapJunctionInterations.eq(0)  ? constant.var(floatType, 0) : AccuV.read(stream.offset(NeuronNumber.cast(dfeUInt(MathUtils.bitsToAddress(NetMaxSize))), -AccuVOff));
 
@@ -303,12 +396,12 @@ class infoliKernel extends Kernel {
 				stream.offset(FaccCompAcc, -AccuFOff),
 				stream.offset(GapJunctionInterations<NetSize/UnrollFactor, -AccuFOff));
 
-		FaccCompAcc.simWatch("FaccCompAcc");
-		VaccCompAcc.simWatch("VaccCompAcc");
+		//FaccCompAcc.simWatch("FaccCompAcc");
+		//VaccCompAcc.simWatch("VaccCompAcc");
 		//NeuronNumber.simWatch("NeuronNumber");
 
-		IC = StepNumber.eq(0) ? ICInput : CONDUCTANCE * (8 * FaccCompAcc + 2 * VaccCompAcc);
-		//IC.simWatch("IC");
+
+		IC = StepNumber.eq(0) ? ICInput : 8 * FaccCompAcc + 2 * VaccCompAcc ;
 		//debug.simPrintf(/*GapJunctionInterations<NetSize/UnrollFactor&*/StepNumber.eq(0) & NeuronNumber.eq(0),"\n[IC = %.8f, FaccComp = %.8f , VaccComp = %.8f] ",IC, FaccComp, VaccComp  );
 		//debug.simPrintf(GapJunctionInterations.eq(NetSize/UnrollFactor-1) & StepNumber.eq(0) /*& NeuronNumber.eq(0)*/,"\n[IC = %.8f",IC );
 
@@ -599,6 +692,12 @@ class infoliKernel extends Kernel {
 		//debug.simPrintf(GapJunctionInterations.eq(NetSize/UnrollFactor-1)&StepNumber<3& NeuronNumber>91,"Axon Values: %.8f %.8f %.8f %.8f \n ",NewCellState[15],NewCellState[16], NewCellState[17],NewCellState[18]);
 
 		io.output("s",  NewCellState[15], floatType,GapJunctionInterations.eq(NetSize/UnrollFactor-1)&StepNumber!==SimSteps);
+
+		NewCellState[15].simWatch("Axon");
+
+		//debug.dfePrintf(GapJunctionInterations.eq(NetSize/UnrollFactor-1)&StepNumber<10/*& NeuronNumber.eq(0)*/,"\n[Dend= %.8f, Soma= %.8f Axon = %.8f ]\n",NewCellState[0],NewCellState[7], NewCellState[15]);
+		//debug.dfePrintf(GapJunctionInterations.eq(NetSize/UnrollFactor-1)&StepNumber<10,"Dend : %.8f %.8f %.8f %.8f %.8f %.8f\n ",NewCellState[0],NewCellState[3], NewCellState[1],NewCellState[2],NewCellState[5], NewCellState[4] );
+
 	}
 
 }

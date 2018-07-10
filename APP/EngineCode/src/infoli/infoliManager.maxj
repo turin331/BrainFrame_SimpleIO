@@ -4,6 +4,7 @@ import com.maxeler.maxcompiler.v2.managers.BuildConfig;
 import com.maxeler.maxcompiler.v2.managers.custom.CustomManager;
 import com.maxeler.maxcompiler.v2.managers.custom.DFELink;
 import com.maxeler.maxcompiler.v2.managers.custom.blocks.KernelBlock;
+import com.maxeler.maxcompiler.v2.managers.custom.stdlib.DebugLevel;
 import com.maxeler.maxcompiler.v2.managers.custom.stdlib.MemoryControlGroup;
 import com.maxeler.maxcompiler.v2.managers.custom.stdlib.MemoryControlGroup.MemoryAccessPattern;
 import com.maxeler.maxcompiler.v2.managers.engine_interfaces.CPUTypes;
@@ -19,8 +20,15 @@ public class infoliManager extends CustomManager {
 
 		KernelBlock  kernel  = addKernel(new infoliKernel(makeKernelParameters(s_kernelName)));
 
+		DebugLevel dbg = new DebugLevel(); //to add debugging annotations in maxdebug graphs
+		dbg.setHasStreamStatus(true);
+		debug.setDebugLevel(dbg);
+
+		config.setAllowNonMultipleTransitions(true);
 		config.setDefaultStreamClockFrequency(engineParams.getStreamFrequency());
-		config.setEnableAddressGeneratorsInSlowClock(true);
+
+
+
 
 		DFELink cpu2lmem = addStreamToOnCardMemory("cpu2lmem", MemoryControlGroup.MemoryAccessPattern.LINEAR_1D);
 		DFELink lmem2cpu = addStreamFromOnCardMemory("lmem2cpu", MemoryControlGroup.MemoryAccessPattern.LINEAR_1D);
@@ -36,11 +44,19 @@ public class infoliManager extends CustomManager {
 		DFELink ini = addStreamFromOnCardMemory("Ini", MemoryAccessPattern.LINEAR_1D);
 		DFELink iApp = addStreamFromOnCardMemory("iApp", MemoryAccessPattern.LINEAR_1D);
 		DFELink IC = addStreamFromOnCardMemory("IC", MemoryAccessPattern.LINEAR_1D);
+		DFELink NeuronChar = addStreamFromOnCardMemory("NeuronChar", kernel.getOutput("NeurCondStream"));
+		DFELink Conn = addStreamFromOnCardMemory("Conn", kernel.getOutput("ConnStream"));
 
 
 		kernel.getInput("Ini").connect(ini);
 		kernel.getInput("iApp").connect(iApp);
 		kernel.getInput("IC").connect(IC);
+
+		kernel.getInput("Conn") <== Conn;
+
+		kernel.getInput("NeuronChar") <== NeuronChar ;
+
+
 
 		DFELink s = addStreamToOnCardMemory("s", MemoryAccessPattern.LINEAR_1D);
 
@@ -48,7 +64,8 @@ public class infoliManager extends CustomManager {
 
 	}
 
-	static final int CellParams = 24;
+	static final int CellStateParams = 24;
+	static final int NeuronCharParams = 24;
 	static final int UnrollFactor =16;  //Make sure this has the same value in the kernel code and manager (UnrollFactor)
 
 
@@ -61,6 +78,14 @@ public class infoliManager extends CustomManager {
 
 		manager.createSLiCinterface(interfaceDefault());
 		configBuild(manager, params);
+
+
+//		manager.debug.setDebugLevel(new DebugLevel() {
+//		    @Override
+//		    public boolean hasStreamStatus() {
+//		        return true;
+//		    }
+//		});
 
 		manager.createSLiCinterface(interfaceWrite("writeLMem"));
 		manager.createSLiCinterface(interfaceRead("readLMem"));
@@ -108,6 +133,7 @@ public class infoliManager extends CustomManager {
 		InterfaceParam  simsteps    = engine_interface.addParam("simsteps", type);
 		InterfaceParam  time_mux_factor    = engine_interface.addParam("time_mux_factor", type);
 		InterfaceParam  Max_N_Size    = engine_interface.addParam("Max_N_Size", type);
+		InterfaceParam  BytesPerBursts    = engine_interface.addParam("BytesPerBursts", type);
 
 		InterfaceParam  zero = engine_interface.addConstant(0l);
 		//ticks
@@ -117,15 +143,16 @@ public class infoliManager extends CustomManager {
 		engine_interface.setScalar(s_kernelName, "simsteps", simsteps);
 		engine_interface.setScalar(s_kernelName, "time_mux_factor", time_mux_factor);
 		engine_interface.setScalar(s_kernelName, "Max_N_Size", Max_N_Size);
+		engine_interface.setScalar(s_kernelName, "BytesPerBursts", BytesPerBursts);
 
 		//Input Traces from LMEM
-		engine_interface.setLMemLinear("Ini", zero, CellParams*N_size * float_size);
-		engine_interface.setLMemLinear("iApp", (CellParams*(Max_N_Size) * float_size), N_size*simsteps* float_size);
-		engine_interface.setLMemLinear("IC",(CellParams*(Max_N_Size) * float_size) + ((Max_N_Size)*simsteps* float_size)+((Max_N_Size)*simsteps* float_size) ,N_size* float_size);
+		engine_interface.setLMemLinear("Ini", zero, CellStateParams*N_size * float_size);
+		engine_interface.setLMemLinear("iApp", (CellStateParams*Max_N_Size * float_size), N_size*simsteps* float_size);
+		engine_interface.setLMemLinear("IC",(CellStateParams*Max_N_Size * float_size) + (Max_N_Size*simsteps*float_size) ,N_size* float_size);
 
 
 		//Output To LMEM
-		engine_interface.setLMemLinear("s",(CellParams*(Max_N_Size) * float_size) + ((Max_N_Size)*simsteps* float_size) ,N_size*simsteps* float_size);
+		engine_interface.setLMemLinear("s",(CellStateParams*(Max_N_Size) * float_size) + ((Max_N_Size)*simsteps* float_size)+ (Max_N_Size*float_size)+ NeuronCharParams*Max_N_Size*(Max_N_Size/Max_N_Size)* float_size + Max_N_Size*Max_N_Size*float_size,N_size*simsteps* float_size);
 		//engine_interface.setLMemLinear("sFrom",(CellParams*(Max_N_Size+128) * float_size) + ((Max_N_Size+128)*simsteps* float_size) ,N_size*simsteps* float_size);
 
 
