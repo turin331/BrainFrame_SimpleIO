@@ -5,7 +5,7 @@ BrainFrame Simple Inferior Olive
 ![Erasmus Brain Project](http://erasmusbrainproject.com/images/lampmonosmall.png)
 
 This is the source code of the Maxeler-based Demo implementation of the Inferior Olive Model developed  within
-the Neuroscience department of the Erasmus Medical Center. 
+the Neuroscience department of the Erasmus MC. 
 
 ## Description
 
