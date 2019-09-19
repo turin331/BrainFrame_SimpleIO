@@ -7,7 +7,7 @@ BrainFrame Simple Inferior Olive
 
 This is the source code of the Maxeler-based Demo implementation of the Inferior Olive Model developed within Neurasmus B.V. (which operates under the holding of the Neuroscience department of the Erasmus MC) in the context of the H2020 Vineyard EU project:
 
-[Vineyard Project](http://www.vineyard-h2020.eu/en/)
+[Imgur](https://imgur.com/K7T1zs8)
 
 ## Description
 
